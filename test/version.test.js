@@ -56,13 +56,20 @@ test('the English title is the official one: Stronghold Protocol: Alliance (as i
   }
 });
 
+test('Fork metadata points to the maintained repository and keeps upstream attribution', () => {
+  const repo = 'https://github.com/Tianyi-ZJU/Stronghold-Protocol';
+  assert.equal(pkg.repository.url, `git+${repo}.git`);
+  assert.equal(pkg.homepage, `${repo}#readme`);
+  assert.equal(pkg.bugs.url, `${repo}/issues`);
+  assert.match(read('README.md'), /\[sganggs\/Stronghold-Protocol\]\(https:\/\/github\.com\/sganggs\/Stronghold-Protocol\)/);
+});
+
 test('GPL-3.0-or-later: LICENSE, package metadata and notices', () => {
   const license = read('LICENSE');
   assert.match(license.slice(0, 200), /GNU GENERAL PUBLIC LICENSE\s+Version 3, 29 June 2007/);
   assert.match(license, /END OF TERMS AND CONDITIONS/);
   assert.equal(pkg.license, 'GPL-3.0-or-later');
   assert.equal(lock.packages[''].license, 'GPL-3.0-or-later');
-  assert.match(pkg.repository.url, /github\.com\/sganggs\/Stronghold-Protocol/);
   for (const f of ['NOTICE.md', 'THIRD-PARTY-NOTICES.md', 'tools/local-extract/LICENSE-Ark-Unpacker.txt']) {
     assert.ok(existsSync(join(ROOT, f)), f);
   }

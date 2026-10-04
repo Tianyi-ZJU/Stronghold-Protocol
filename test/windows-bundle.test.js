@@ -38,10 +38,19 @@ describe('make-windows-bundle.mjs: --out 不能指向仓库自己或它的上级
 
   test('大小写不同也算同一个目录（Windows / macOS 的文件系统默认不区分大小写）', async () => {
     const { outDirIsUnsafe } = await mod('scripts/make-windows-bundle.mjs');
-    // Linux 的默认文件系统区分大小写：`/HOME/X` 就是另一个目录，放行才对。
-    const sameThing = process.platform !== 'linux';
-    assert.equal(outDirIsUnsafe(ROOT.toUpperCase()), sameThing, `大写写法的仓库路径（${ROOT.toUpperCase()}）`);
-    assert.equal(outDirIsUnsafe(ROOT.replace(/\//g, path.sep).toLowerCase()), sameThing, '全小写写法');
+    // 用明确含大小写的目录测试，避免 /app 等全小写仓库路径转换后其实没有变化。
+    const base = await fsp.mkdtemp(path.join(os.tmpdir(), 'sp-case-'));
+    try {
+      const root = path.join(base, 'Mixed-Case-Repo');
+      await fsp.mkdir(root);
+      // Linux 的默认文件系统区分大小写：变换后的写法指向另一个目录。
+      const sameThing = process.platform !== 'linux';
+      assert.equal(outDirIsUnsafe(root, root), true, '原始写法');
+      assert.equal(outDirIsUnsafe(root.toUpperCase(), root), sameThing, '全大写写法');
+      assert.equal(outDirIsUnsafe(root.toLowerCase(), root), sameThing, '全小写写法');
+    } finally {
+      await fsp.rm(base, { recursive: true, force: true });
+    }
   });
 
   test('经过符号链接的路径会被认出来（macOS 的 /tmp 就是指向 /private/tmp 的链接）', async () => {
