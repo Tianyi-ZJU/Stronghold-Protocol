@@ -1,0 +1,24 @@
+html { font-size: 100%; min-height: 100%; }
+body { height: auto; min-height: 100vh; overflow: auto; font-size: 16px; background: radial-gradient(ellipse at 15% 0%, #11281f 0%, #0c0f0e 65%); }
+main { width: min(960px, 100%); margin: 0 auto; padding: 64px 28px; }
+header, footer, .summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+header { margin-bottom: 36px; }
+.eyebrow { color: var(--mint-500); font-size: 11px; letter-spacing: .15em; margin-bottom: 10px; }
+h1 { font-size: clamp(26px, 5vw, 40px); letter-spacing: .05em; }
+.back, button { color: var(--mint-400); border: 1px solid var(--mint-800); background: #0d1b15; border-radius: 5px; padding: 10px 14px; text-decoration: none; white-space: nowrap; font-size: 14px; }
+.back:hover, button:hover { border-color: var(--mint-500); }
+.total { padding: 36px; border: 1px solid var(--mint-800); background: linear-gradient(120deg, rgba(78,216,175,.08), rgba(0,0,0,.15)); border-radius: 10px; }
+.indicator { display: inline-block; width: 8px; height: 8px; background: var(--mint-500); border-radius: 50%; margin-right: 8px; }
+.total > strong { display: inline-block; font-size: 88px; line-height: 1.1; margin: 20px 12px 20px 0; color: var(--mint-400); font-variant-numeric: tabular-nums; }
+.total > span:nth-child(2) { display: inline-block; width: calc(100% - 24px); }
+.total p, article p, .note, #status { color: var(--text-lo); font-size: 14px; }
+.breakdown { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+article { padding: 24px; background: #111815; border: 1px solid var(--line); border-radius: 8px; }
+h2 { font-size: 16px; color: var(--text-md); font-weight: 500; }
+article strong { display: block; font-size: 40px; margin: 10px 0; font-variant-numeric: tabular-nums; }
+.summary { justify-content: flex-start; gap: 32px; margin: 24px 0; font-size: 14px; color: var(--text-lo); }
+.summary b { color: var(--text-hi); margin-left: 8px; }
+footer { border-top: 1px solid var(--line); padding-top: 20px; }
+.note { margin-top: 24px; line-height: 1.8; font-size: 12px; }
+#status.is-error { color: var(--amber); }
+@media (max-width: 600px) { main { padding: 32px 16px; } header { align-items: flex-start; } .eyebrow { max-width: 200px; line-height: 1.8; } .breakdown { grid-template-columns: 1fr; gap: 10px; } article { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 18px 24px; } article strong { grid-row: span 2; margin: 0; } .total { padding: 28px; } .total > strong { font-size: 72px; } }

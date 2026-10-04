@@ -20,6 +20,22 @@ const tick = () => new Promise((r) => setImmediate(r));
 const cam = () => presetCamera('prep', { width: 1280, height: 720 });
 const diamonds = () => fake.canvases.filter((c) => c.width === 160 && c.height === 160);
 
+test('attack lunge belongs to fallback portraits; loaded Spine models stay anchored at their feet', async () => {
+  for (const spine of [false, true]) {
+    const unitView = view({}, {}, store({ spine }));
+    await tick(); await tick();
+    const camera = cam(), base = camera.project(unitView.x, unitView.y, unitView.z + unitView.hover + unitView.lift);
+    unitView.onAttack({ x: unitView.x + 1, y: unitView.y + 1 }, 0, 'arrow');
+    unitView.update(0.1, camera, 0.1);
+    unitView.update(0.05, camera, 0.15);
+    if (spine) {
+      assert.ok(Math.abs(unitView.root.position.x - base.x) < 1e-6);
+      assert.ok(Math.abs(unitView.root.position.y - base.y) < 1e-6);
+    } else assert.ok(Math.hypot(unitView.root.position.x - base.x, unitView.root.position.y - base.y) > 1);
+    unitView.destroy();
+  }
+});
+
 /** Asset store stub: avatar image + (optionally) a Spine model, both resolved asynchronously. */
 function store({ image = true, spine = false, imageDelay = 0 } = {}) {
   const img = { width: 180, height: 180 };

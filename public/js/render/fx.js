@@ -120,9 +120,15 @@ const ANCHOR_SNAP = 0.75;
 const SKILL_GOLD = 0xffd45a;
 const NO_OPTS = Object.freeze({});
 const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
-/** World height of a unit's chest (shots start / aim there) and just above its feet (where shells land). */
-const chestZ = (v) => (v.z || 0) + (v.hover || 0) + (v._headTiles || 1.2) * 0.45;
-const feetZ = (v) => (v.z || 0) + (v.hover || 0) + 0.2;
+const CHEST = { x: 0, y: 0, z: 0 };
+function chestPoint(view, cam, out = CHEST, column = view.x, row = view.y) {
+  const height = (view._headTiles || 1.2) * 0.55, tilt = (cam.tilt || 0) * Math.PI / 180;
+  out.x = column; out.y = row + height * Math.cos(tilt);
+  out.z = (view.z || 0) + (view.hover || 0) + (view.lift || 0) + height * Math.sin(tilt);
+  return out;
+}
+const feetZ = (v) => (v.z || 0) + (v.hover || 0) + (v.lift || 0) + 0.2;
+const chestZ = (v) => (v.z || 0) + (v.hover || 0) + (v.lift || 0) + (v._headTiles || 1.2) * 0.45;
 /** Cheap fingerprint of a camera's framing (the damage-number layout cache is reused only while it is unchanged). */
 const camKey = (c) => (c ? c.tx + c.ty * 1e3 + c.tz * 1e6 + c.tilt * 7.13 + c.dist * 1e4 + c.scale * 3.7e-2 + c.cx * 1.1e-5 + c.cy * 1.3e-8 : 0);
 /** Characters of a damage number as drawn (heals get a '+'). */
@@ -454,8 +460,8 @@ export class FxSystem {
   }
 
   _chest(view, out = this._p) {
-    const z = (view.z || 0) + (view.hover || 0) + (view._headTiles ? view._headTiles * 0.45 : 0.5);
-    return this._proj(view.x, view.y, z, out);
+    const cam = this.ctx.cam(), point = chestPoint(view, cam);
+    return cam.project(point.x, point.y, point.z, out);
   }
 
   /** `n` sparks flying out of a screen point (halved at quality 'low'); o: speed, up, g, life, size, tex. */
@@ -490,9 +496,11 @@ export class FxSystem {
     const ux = dist > 1e-6 ? dx / dist : (src.facing || 1) >= 0 ? 1 : -1, uy = dist > 1e-6 ? dy / dist : 0;
     const hand = Math.min(0.28, dist * 0.3);   // the weapon is in front of the body
     const look = spec.look;
+    const cam = this.ctx.cam(), point = chestPoint(src, cam, CHEST, src.x + ux * hand, src.y + uy * hand);
     pr.kind = kind; pr.spec = spec; pr.src = src; pr.tgt = tgt; pr.rise = 0;
-    pr.x0 = src.x + ux * hand; pr.y0 = src.y + uy * hand; pr.z0 = chestZ(src);
-    pr.tx = tgt.x; pr.ty = tgt.y; pr.tz = look === 'shell' ? feetZ(tgt) : chestZ(tgt);
+    pr.x0 = point.x; pr.y0 = point.y; pr.z0 = point.z;
+    if (look === 'shell') { pr.tx = tgt.x; pr.ty = tgt.y; pr.tz = feetZ(tgt); }
+    else { chestPoint(tgt, cam, point); pr.tx = point.x; pr.ty = point.y; pr.tz = point.z; }
     pr.t = 0; pr.fade = 0; pr.hit = false; pr.emit = Math.random(); pr.ang = Math.atan2(-uy, ux);   // ≈ on screen (rows run up)
     pr.dur = clamp(dist / projSpeed(kind) / this._ts(), 0.04, 1.5);
     pr.arc = spec.arc ? spec.arc * clamp(0.45 + dist * 0.18, 0.6, 1.8) : 0;
@@ -587,7 +595,10 @@ export class FxSystem {
     const spec = pr.spec, look = spec.look;
     pr.t += dt;
     const tg = pr.tgt;
-    if (tg && !tg.destroyed && tg.alive !== false) { pr.tx = tg.x; pr.ty = tg.y; pr.tz = look === 'shell' ? feetZ(tg) : chestZ(tg); }
+    if (tg && !tg.destroyed && tg.alive !== false) {
+      if (look === 'shell') { pr.tx = tg.x; pr.ty = tg.y; pr.tz = feetZ(tg); }
+      else { const point = chestPoint(tg, cam); pr.tx = point.x; pr.ty = point.y; pr.tz = point.z; }
+    }
     const k = Math.min(1, pr.t / pr.dur);
     if (k >= 1 && !pr.hit) { pr.hit = true; pr.fade = 0; this._impact(pr, cam); }
     let fk = 0;
@@ -654,12 +665,12 @@ export class FxSystem {
     let gx, gy, gz;
     if (pr.phase === 0) {
       const tg = pr.tgt;
-      if (tg && !tg.destroyed && tg.alive !== false) { pr.tx = tg.x; pr.ty = tg.y; pr.tz = chestZ(tg); }
+      if (tg && !tg.destroyed && tg.alive !== false) { const point = chestPoint(tg, cam); pr.tx = point.x; pr.ty = point.y; pr.tz = point.z; }
       gx = pr.tx; gy = pr.ty; gz = pr.tz;
     } else {
       const sv = pr.src;
       if (!sv || sv.destroyed || sv.alive === false) return false;
-      gx = sv.x; gy = sv.y; gz = chestZ(sv);
+      const point = chestPoint(sv, cam); gx = point.x; gy = point.y; gz = point.z;
     }
     const dx = gx - pr.bx, dy = gy - pr.by, dz = gz - pr.bz;
     const d = Math.hypot(dx, dy, dz);
@@ -726,7 +737,7 @@ export class FxSystem {
     if (k < pr.rise) {
       const u = k / pr.rise, ub = Math.max(0, u - 0.25);
       const sv = pr.src;
-      if (sv && !sv.destroyed) { pr.x0 = sv.x; pr.y0 = sv.y; }
+      if (sv && !sv.destroyed) { const point = chestPoint(sv, cam); pr.x0 = point.x; pr.y0 = point.y; pr.z0 = point.z; }
       x = pr.x0; y = pr.y0;
       z = pr.z0 + SHELL_UP * (1 - (1 - u) * (1 - u));          // out of the barrel fast, slowing as it climbs
       zq = pr.z0 + SHELL_UP * (1 - (1 - ub) * (1 - ub));
@@ -864,7 +875,8 @@ export class FxSystem {
     const pr = this._takeProj();
     const gz = this._groundZ(x, y);
     pr.kind = 'bombardShell'; pr.spec = BOMBARD_SHELL; pr.src = src; pr.tgt = null;
-    pr.x0 = src ? src.x : x; pr.y0 = src ? src.y : y; pr.z0 = src ? chestZ(src) : gz + 0.5;
+    const point = src ? chestPoint(src, this.ctx.cam()) : null;
+    pr.x0 = point ? point.x : x; pr.y0 = point ? point.y : y; pr.z0 = point ? point.z : gz + 0.5;
     pr.tx = x; pr.ty = y; pr.tz = gz;
     pr.t = 0; pr.dur = clamp(flight, 0.1, 4); pr.fade = 0; pr.hit = false; pr.emit = 0; pr.arc = 0; pr.ang = Math.PI / 2;
     pr.rise = pr.dur >= 0.45 ? SHELL_RISE : 0;

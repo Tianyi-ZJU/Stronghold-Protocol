@@ -27,7 +27,7 @@ Out of scope v1: matchmaking queue, training/tutorial, DIY (甄选) slots (the 4
 
 ## 1. Tech stack
 
-- **Node.js ≥ 22** (CI: 22 and 24), ESM (`"type": "module"`), single dependency `ws@8`. No bundler, no TypeScript. JSDoc types where helpful.
+- **Node.js ≥ 22** (CI: 22 and 24), ESM (`"type": "module"`). HTTP routing and middleware use `hono@4` with `@hono/node-server`; WebSocket uses `ws@8`. No bundler, no TypeScript. JSDoc types where helpful.
 - **Server-authoritative simulation.** Clients send *intents*; the server validates, mutates state and pushes state/snapshots.
 - **Client:** static files, native ES modules. Vendored libs in `public/vendor/`: `pixi.min.js` (PixiJS **7.4.2** UMD, global `PIXI`), `pixi-spine.js` (**4.0.6** UMD, `PIXI.spine`), `preact.module.js` + `hooks.module.js` + `htm.module.js` (Preact 10 + htm, no build step). No CDN at runtime (LAN play must work offline).
 - **Shared code** in `shared/` is imported by both server and browser (pure ESM, no Node APIs).
@@ -41,7 +41,14 @@ Run: `npm install && npm run assets && npm start` → `http://localhost:3000`. F
 
 ```
 server/
-  index.js                 HTTP static server (gzip for .skel/.atlas/.json/.js/.css), WebSocket upgrade at /ws, boot
+  index.js                 assembles the Hono HTTP application, WebSocket upgrade at /ws, boot and shutdown
+  http/
+    app.js                 Hono application and Node adapter; centralized HTTP error handling
+    middleware.js          security headers, DEBUG request logs, raw URL and method policy
+    routes/health.js       /healthz response
+    static.js              static and media serving (gzip, validators, byte ranges, private-module protection)
+    response.js            shared error pages and native-response bridge
+    url.js                 raw path/query parsing shared with WebSocket upgrades
   net.js                   session registry, send helpers, per-connection rate limit, message validation (uses shared/protocol.js)
   lobby.js                 rooms (4-letter codes), seats, host, AI seats, ready/start, reconnect tokens, room→Match wiring
   data.js                  loads data/*.json once, builds indexes (getChess, getBond, …); frozen objects

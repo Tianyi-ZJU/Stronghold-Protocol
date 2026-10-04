@@ -533,11 +533,14 @@ export function spawnChildren(b, parent, key, n, opts = {}) {
   const out = [];
   const route = opts.route ?? remainingRoute(parent);
   const cnt = Math.max(0, Math.min(20, Math.floor(n)));
+  const inherited = opts.mods ?? parent.mods;
+  const mods = inherited ? { ...inherited } : null;
+  if (mods) { delete mods.bountyId; delete mods.bountyCoins; }
   for (let i = 0; i < cnt; i++) {
     const off = cnt > 1 ? (i - (cnt - 1) / 2) * 0.2 : 0;
     const pos = opts.pos ?? [parent.y, parent.x + off];
     const c = b.spawnEnemy(key, {
-      pos, route, mods: opts.mods ?? parent.mods ?? null, tag: opts.tag ?? null, countInTotal: opts.countInTotal,
+      pos, route, mods, tag: opts.tag ?? null, countInTotal: opts.countInTotal,
       ownerPlayerId: parent.ownerId ?? null, sourcePlayerId: parent.sourcePlayerId ?? null,
     });
     if (c) out.push(c);

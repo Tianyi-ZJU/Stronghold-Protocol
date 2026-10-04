@@ -17,6 +17,7 @@ import { net, identity } from '../net.js';
 import { store, useStore, shallowEqual } from '../store.js';
 import { data, useData } from '../data.js';
 import { FullscreenButton, detectFeatures } from '../ui/device.js';
+import { OnlinePill } from '../ui/onlinePill.js';
 
 // Same character classes as server/net.js sanitizeName (control, zero-width, bidi, BOM), so a name
 // the client accepts is never rejected by the server's hello validation.
@@ -257,6 +258,7 @@ export function TitleScreen() {
           <span class=${`status-dot ${dotClass}`}></span>
           <span>${STATUS_TEXT[conn.status] || conn.status}</span>
           ${conn.status === 'online' ? html`<${PingPill} ms=${conn.ping} />` : null}
+          <${OnlinePill} />
           <${GuideButton} class="title-guide" />
           <${FullscreenButton} class="title-fs" />
         </div>

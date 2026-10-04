@@ -6,6 +6,19 @@
 ![license](https://img.shields.io/badge/code%20license-GPL--3.0--or--later-blue)
 ![node](https://img.shields.io/badge/node-22%20%7C%2024-339933)
 
+## 本 Fork 的改动（2026-10-04）
+
+本 Fork 由 Tianyi-ZJU 维护，基于 [sganggs/Stronghold-Protocol](https://github.com/sganggs/Stronghold-Protocol)
+的 `bdb0765c5579c430cbe1ef79cf3d62831bb062a7`（0.1.2）修改，继续采用 GPL-3.0-or-later。
+
+- HTTP 路由、安全响应头、请求日志及错误处理迁入 Hono；保留静态资源缓存、压缩、音频 Range、路径保护和原有 WebSocket 服务。见 [HTTP 架构说明](docs/HTTP.md)。
+- 新增标题页、大厅的在线人数，以及 `/online/` 汇总页面。游客、AI 和离线重连记录不计入在线人数，不展示昵称、IP 或令牌。
+- 修复被动技能突袭、信标礼物归属、分裂子体重复赏金，以及模型攻击位移和弹道出射高度。
+
+这是源码分发；本 Fork 尚未发布包含上述改动的整合包。先按下方「从源码运行」安装。
+游戏素材、字体和第三方依赖不加入新提交，本机部署配置及验收截图也不随此版本分发。
+上游已有的游戏数据和截图仍遵循原版权声明。完整改动见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 声明
 
 > [!IMPORTANT]
@@ -77,7 +90,7 @@ English summary: [below](#english).
 ### 方式二：从源码运行
 
 ```bash
-git clone https://github.com/sganggs/Stronghold-Protocol.git
+git clone -b fork-enhancements https://github.com/Tianyi-ZJU/Stronghold-Protocol.git
 cd Stronghold-Protocol
 npm install        # 安装依赖（postinstall 会把 pixi / preact / three 复制到 public/vendor）
 npm run setup      # 检查环境，并从公开镜像下载约 270 MB 美术 / 音频（可中断，再次运行会续传）
@@ -167,6 +180,8 @@ npm start          # 启动服务器：http://localhost:3000
 | [CHANGELOG.md](CHANGELOG.md) | 更新记录：每个版本修复了什么、哪些反馈经核实不是问题 |
 | [docs/PLAYING.md](docs/PLAYING.md) | 玩法指南：流程、经济、招募与晋升、摆阵、联防、盟约、最终攻势、结算称号 |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | 部署指南：Windows 开服与开机自启、防火墙、组网 / 隧道、反向代理与 HTTPS、Docker、systemd、排错 |
+| [docs/HTTP.md](docs/HTTP.md) | Hono 路由、中间件、静态响应桥接与错误处理 |
+| [docs/FORK.md](docs/FORK.md) | 本 Fork 的改动、源码安装与合并上游更新 |
 | [docs/WINDOWS.md](docs/WINDOWS.md) | Windows 便携包：怎么打一份「零安装」包（`scripts/make-windows-bundle.mjs`）、包里放了什么、授权注意事项 |
 | [docs/DESIGN.md](docs/DESIGN.md) | 架构与契约（英文）：技术栈、目录分工、网络协议、渲染与 UI、各次试玩后的规则修订 |
 | [docs/SIM.md](docs/SIM.md) | 战斗模拟引擎参考（英文）：钩子、技能描述格式、职业默认行为 |
@@ -193,7 +208,7 @@ RENDER_E2E=1 node --test 'test/render/*.browser.test.js'   # 渲染测试，部�
 
 | 路径 | 内容 |
 |---|---|
-| `server/` | Node HTTP 静态服务 + WebSocket（`/ws`）、大厅、对局引擎（`match/`）、战斗模拟（`sim/`，浏览器与服务器共用） |
+| `server/` | Hono HTTP 路由与中间件（`http/`）、静态资源服务 + WebSocket（`/ws`）、大厅、对局引擎（`match/`）、战斗模拟（`sim/`，浏览器与服务器共用） |
 | `shared/` | 前后端共用的常量与网络协议 |
 | `public/` | 浏览器客户端（原生 ES 模块，PixiJS + pixi-spine、three.js 3D 棋盘、Preact + htm UI） |
 | `data/` | 由官方数据表生成的游戏数据与素材清单 `assets.json` |
@@ -215,6 +230,7 @@ RENDER_E2E=1 node --test 'test/render/*.browser.test.js'   # 渲染测试，部�
 - 规则核对参考：[PRTS 明日方舟中文 Wiki](https://prts.wiki/)。
 - LZ4AK 解包：`tools/local-extract/aklz4.py` 的算法来自 [isHarryh/Ark-Unpacker](https://github.com/isHarryh/Ark-Unpacker)（BSD-3-Clause，经 MooncellWiki/UnityPy）；解析 Unity 资源使用 [UnityPy](https://github.com/K0lb3/UnityPy)（MIT）。
 - 库：[PixiJS](https://pixijs.com/)（MIT）、[pixi-spine](https://github.com/pixijs/spine)（MIT；其中包含的 Spine Runtime 另受 [Spine Runtimes License](https://esotericsoftware.com/spine-runtimes-license) 约束）、[three.js](https://threejs.org/)（MIT）、[Preact](https://preactjs.com/) + [htm](https://github.com/developit/htm)（MIT）、[ws](https://github.com/websockets/ws)（MIT）。
+- HTTP 路由与 Node 适配器：[Hono](https://github.com/honojs/hono) 和 [@hono/node-server](https://github.com/honojs/node-server)（MIT）。
 
 感谢以上项目的作者与维护者，以及鹰角网络带来的这款游戏。
 

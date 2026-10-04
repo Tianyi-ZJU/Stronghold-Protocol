@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0c0f0e">
+  <title>在线人数 · 卫戍协议：盟约</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/online.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div><p class="eyebrow">STRONGHOLD PROTOCOL · ALLIANCE</p><h1>在线人数</h1></div>
+      <a class="back" href="../">返回游戏 ↗</a>
+    </header>
+    <section class="total" aria-label="当前在线玩家">
+      <span class="indicator"></span><span>当前在线玩家</span>
+      <strong data-stat="online">—</strong><span>人</span>
+      <p>填写博士代号并进入游戏后计入，离线后移除。</p>
+    </section>
+    <section class="breakdown" aria-label="玩家状态">
+      <article><h2>大厅中</h2><strong data-stat="lobby">—</strong><p>已进入游戏，尚未加入房间</p></article>
+      <article><h2>房间中</h2><strong data-stat="waiting">—</strong><p>等待开始模拟</p></article>
+      <article><h2>对局中</h2><strong data-stat="playing">—</strong><p>正在进行模拟</p></article>
+    </section>
+    <div class="summary"><span>房间总数 <b data-stat="rooms">—</b></span><span>进行中的对局 <b data-stat="matches">—</b></span></div>
+    <footer><p id="status" role="status">正在获取在线人数…</p><button id="refresh" type="button">立即刷新</button></footer>
+    <p class="note">每 5 秒自动更新。此页面不计入在线人数；AI 队友与断线后的重连保留记录也不计入。同一玩家重连不重复计数；新建独立玩家身份的多个标签页分别计数。</p>
+    <noscript><p class="note">请启用 JavaScript 查看在线人数。</p></noscript>
+  </main>
+  <script type="module" src="/js/online.js"></script>
+</body>
+</html>

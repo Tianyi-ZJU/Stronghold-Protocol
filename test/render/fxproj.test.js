@@ -52,6 +52,22 @@ const run = (fx, seconds, dt = DT) => { for (let t = 0; t < seconds - 1e-9; t +=
 const texName = (fx, tex) => Object.keys(fx.tex).find((k) => fx.tex[k] === tex);
 const liveTex = (fx, name) => fx.parts.filter((p) => p.sp.texture === fx.tex[name]);
 
+test('projectile muzzle uses billboard hand height at different camera pitches and raised/flying positions', () => {
+  for (const tilt of [0, 20, 30, 60]) for (const offsets of [{}, { z: 0.42, hover: 0.3, lift: 0.8 }]) {
+    const camera = cam.clone(); camera.tilt = tilt; camera.update();
+    const src = unit(1, 5, 11, offsets), tgt = unit(2, 8, 11);
+    const { fx } = makeFx();
+    fx.ctx.cam = () => camera;
+    fx.attack(src, tgt, 'arrow');
+    const pr = fx.projs[0];
+    const base = camera.project(src.x + 0.28, src.y, (src.z || 0) + (src.hover || 0) + (src.lift || 0));
+    const muzzle = camera.project(pr.x0, pr.y0, pr.z0);
+    const fraction = (base.y - muzzle.y) / (src._headTiles * base.s);
+    assert.ok(fraction >= 0.5 && fraction <= 0.6, `tilt=${tilt}: hand height ${fraction}`);
+    fx.destroy();
+  }
+});
+
 describe('projectile speeds follow the sim', () => {
   test('style.js PROJ mirrors PROJECTILE_SPEEDS for every sim kind (and the boomerang return speed)', () => {
     for (const [kind, v] of Object.entries(SIM.PROJECTILE_SPEEDS)) {

@@ -310,11 +310,14 @@ function raidPoll(battle, st) {
   let targets = null; // the player's candidates (raidTargets), shared by its members until a jump changes the field
   for (const u of st.members[ID.raid]) {
     if (!onField(u) || !u.canAct) continue;
+    const passive = !u.skill?.noSkill && u.skill?.kind === 'passive';
+    const occupied = passive && battle.enemiesInKeys(u.rangeKeys || [], u, u.profile).length;
+    if (occupied) { u.mem.raidPassiveArmed = false; continue; }
     const since = Math.max(u.lastAttackAt ?? -Infinity, u.deployedAt ?? -Infinity, u.mem[KEY.raid] ?? -Infinity);
-    const ready = !!(u.skill && u.skill.ready && !(u.skill.active && u.skill.isTimed));
+    const ready = !!(u.skill && (u.skill.ready || (passive && u.mem.raidPassiveArmed)) && !(u.skill.active && u.skill.isTimed));
     const idleOk = battle.time - since >= idle - 1e-9;
     if (!(ready || idleOk)) continue;
-    if (battle.enemiesInKeys(u.rangeKeys || [], u, u.profile).length) continue;
+    if (!passive && battle.enemiesInKeys(u.rangeKeys || [], u, u.profile).length) continue;
     const list = (targets ??= raidTargets(battle, u, st.pid));
     if (!list.length) continue;
     // either trigger: raidTile only offers tiles with the target in range (without that a ready skill that finds no
@@ -327,6 +330,7 @@ function raidPoll(battle, st) {
       targets = null; // the retreat / redeploy handlers (部署时 effects) may change the enemies: the next member re-sorts
       const res = raidRedeploy(battle, u, tile[0], tile[1]);
       if (!res) continue;
+      u.mem.raidPassiveArmed = false;
       u.mem[KEY.raid] = battle.time; // with deployedAt: the idle time starts again from the landing
       if (res === 'raid') {
         battle.addBuff(u, { key: KEY.raid, mods: st.raidMods });
@@ -394,6 +398,11 @@ export function install(battle) {
   if (has(ID.raid)) {
     const raid = states.filter((st) => st.tiers[ID.raid] && st.members[ID.raid].size);
     if (raid.length) {
+      battle.on('deploy', ({ unit }) => {
+        const state = unit && byPid[unit.ownerId];
+        if (!state?.members[ID.raid]?.has(unit) || unit.skill?.noSkill || unit.skill?.kind !== 'passive') return;
+        unit.mem.raidPassiveArmed = !battle.enemiesInKeys(unit.rangeKeys || [], unit, unit.profile).length;
+      });
       battle.every(RAID_POLL, () => { for (const st of raid) raidPoll(battle, st); });
     }
   }

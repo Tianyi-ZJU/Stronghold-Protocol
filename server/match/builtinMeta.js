@@ -162,7 +162,7 @@ const ITEM_HANDLERS = {
         if (score > best) { best = score; pick = [t]; } else if (score === best) pick.push(t);
       }
       const to = ctx.rng.pick(pick);
-      if (to) ctx.addEffect({ id: `gift:${ev.item.uid}`, key: 'effect:builtin_gift', hidden: true, battle: false, params: { toPlayerId: to.playerId, chessId: original } });
+      if (to) to.addEffect({ id: `gift:${ev.item.uid}`, key: 'effect:builtin_gift', hidden: true, battle: false, params: { toPlayerId: to.playerId, fromName: ctx.name, chessId: original } });
     },
   },
   sell_char_count_gain_equip_owner_bond: {
@@ -238,7 +238,7 @@ const EFFECT_HANDLERS = {
       const to = ctx.player(p.toPlayerId);
       if (!to || !p.chessId) return;
       const got = to.grantChess(p.chessId);
-      if (got) to.giftTicker(ctx.name, p.chessId);
+      if (got) to.giftTicker(p.fromName ?? ctx.name, p.chessId);
     },
   },
   // 整备: the next purchased item becomes advanced (golden)

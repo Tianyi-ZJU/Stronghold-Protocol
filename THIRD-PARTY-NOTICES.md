@@ -18,6 +18,8 @@ them (with `node_modules/`, which keeps each package's own licence file).
 | [htm](https://github.com/developit/htm) | 3.1.1 | Apache-2.0 | UI templates — `public/vendor/htm.module.js` | no (npm) | yes |
 | [three.js](https://github.com/mrdoob/three.js) | 0.186.1 | MIT | official 3D board — `public/vendor/three.core.js`, `three.module.js` | no (npm) | yes |
 | [ws](https://github.com/websockets/ws) | 8.22.0 | MIT | WebSocket server (`server/`) | no (npm) | yes (`node_modules/`) |
+| [Hono](https://github.com/honojs/hono) | 4.13.13 | MIT | HTTP routing and middleware (`server/http/`) | no (npm) | yes (`node_modules/`) |
+| [@hono/node-server](https://github.com/honojs/node-server) | 2.1.3 | MIT | Node HTTP adapter (`server/http/app.js`) | no (npm) | yes (`node_modules/`) |
 | [Node.js](https://nodejs.org/) | v22.23.3 (pinned in `scripts/make-windows-bundle.mjs`) | MIT | the portable `node\node.exe` (**Windows portable package only** — the integration bundle in [Releases](../../releases/latest) ships no `node.exe`) | no (downloaded from nodejs.org at package time, sha256 verified) | **Windows portable package only** (`node\node.exe`, with `node\LICENSE-node.txt`) |
 | [puppeteer-core](https://github.com/puppeteer/puppeteer) | 25.12.0 | Apache-2.0 | optional browser tests (dev dependency) | no (npm) | no |
 | [Ark-Unpacker](https://github.com/isHarryh/Ark-Unpacker) LZ4AK decoder | — | BSD-3-Clause | `tools/local-extract/aklz4.py` (optional local extraction) | **yes** — keeps its notice; full text also in `tools/local-extract/LICENSE-Ark-Unpacker.txt` | yes |
@@ -54,6 +56,58 @@ sources (the wikis' texts are CC BY-NC-SA).
 ---
 
 ## Licence texts
+
+### Hono — MIT
+
+```text
+MIT License
+
+Copyright (c) 2021 - present, Yusuke Wada and Hono contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### @hono/node-server — MIT
+
+```text
+MIT License
+
+Copyright (c) 2022 - present, Yusuke Wada and Hono contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ### PixiJS — MIT
 

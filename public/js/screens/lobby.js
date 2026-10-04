@@ -13,6 +13,7 @@ import { html, Button, Icon, MicroLabel, Panel, TextField, PingPill, AvatarFrame
 import { toast, toastError } from '../ui/toasts.js';
 import { GuideButton } from '../ui/guide.js';
 import { LoadoutButton } from './loadout.js';
+import { OnlinePill } from '../ui/onlinePill.js';
 import { net, identity } from '../net.js';
 import { store, useStore, shallowEqual, loadPref, savePref } from '../store.js';
 import { getConfig, getMode, getStage, useData } from '../data.js';
@@ -260,6 +261,7 @@ export function LobbyScreen() {
       <div class="topbar__left">
         <${Button} variant="ghost" size="sm" icon="chevronLeft" onClick=${backToTitle} title="返回标题">返回<//>
         <${PingPill} ms=${conn.ping} online=${online} />
+        <${OnlinePill} />
       </div>
       <div class="topbar__center">
         <${MicroLabel} tone="mint">SIMULATION PROTOCOL SELECT<//>

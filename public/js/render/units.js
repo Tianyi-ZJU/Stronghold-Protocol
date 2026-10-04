@@ -877,7 +877,7 @@ export class UnitView {
     this.alpha = alpha;
 
     // body placement
-    const lungeK = this.lunge > 0 ? Math.sin(this.lunge * Math.PI) * 0.12 : 0;
+    const lungeK = !this.spineReady && this.lunge > 0 ? Math.sin(this.lunge * Math.PI) * 0.12 : 0;
     this.lunge = Math.max(0, this.lunge - dt * 5);
     const lx = this.lungeDir.x * lungeK, ly = this.lungeDir.y * lungeK;
     let bx = p.x, by = p.y;

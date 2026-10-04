@@ -941,3 +941,8 @@
   --bk-c: var(--red-premium);
 }
 .crash__box h2 { font-size: .3rem; }
+
+.online-pill { display: inline-flex; align-items: center; gap: .06rem; flex-shrink: 0; padding: .035rem .08rem; border: 1px solid var(--mint-800); border-radius: .04rem; color: var(--text-md); font-size: .14rem; text-decoration: none; white-space: nowrap; }
+.online-pill:hover { color: var(--mint-400); border-color: var(--mint-500); }
+.online-pill .icon { width: .16rem; height: .16rem; color: var(--mint-500); }
+.online-pill b { color: var(--mint-400); }

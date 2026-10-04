@@ -28,6 +28,10 @@ logs/
 scripts/service.env.cmd
 .env
 .env.*
+compose.yaml
+deploy/
+bug统计.md
+bug核查.md
 
 # --- OS / editor clutter ---------------------------------------------------------------------------
 .DS_Store
