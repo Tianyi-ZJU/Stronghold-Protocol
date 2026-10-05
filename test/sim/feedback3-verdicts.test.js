@@ -12,8 +12,9 @@ test('深溟巢涌者: every pulse damages each nearby unit exactly once; no ext
     const hits = new Map();
     harness.b.on('damaged', (context) => {
       if (context.source?.defId !== key || context.dmg.type === 'element') return;
-      assert.ok(context.dmg.isAttack, 'damage belongs to the pulse attack');
-      const id = `${context.dmg.attackId}:${context.target.id}`;
+      assert.ok(!context.dmg.isAttack, 'the nest pulses without a normal attack');
+      assert.ok(context.dmg.tags.includes('nestPulse'), 'damage belongs to the aura pulse');
+      const id = `${harness.b.time}:${context.target.id}`;
       hits.set(id, (hits.get(id) || 0) + 1);
     });
     harness.run(5);

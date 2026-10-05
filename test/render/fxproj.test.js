@@ -63,7 +63,7 @@ test('projectile muzzle uses billboard hand height at different camera pitches a
     const base = camera.project(src.x + 0.28, src.y, (src.z || 0) + (src.hover || 0) + (src.lift || 0));
     const muzzle = camera.project(pr.x0, pr.y0, pr.z0);
     const fraction = (base.y - muzzle.y) / (src._headTiles * base.s);
-    assert.ok(fraction >= 0.5 && fraction <= 0.6, `tilt=${tilt}: hand height ${fraction}`);
+    assert.ok(Math.abs(fraction - FX.SHOT_HEIGHT.launch) < 1e-6, `tilt=${tilt}: hand height ${fraction}`);
     fx.destroy();
   }
 });

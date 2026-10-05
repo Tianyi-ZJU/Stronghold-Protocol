@@ -68,3 +68,32 @@ test('a reconnect or replacement of the same player is counted once', async t =>
   assert.equal((await f.health()).presence.online, 1);
   assert.equal((await f.health()).sessions, 1);
 });
+
+test('spectators count once through reconnect, taking a seat, watching a match and leaving', async t => {
+  const f = await fixture(t);
+  const host = await f.connect('房主');
+  const guest = await f.connect('队友');
+  const watcher = await f.connect('观战');
+  assert.equal((await host.request({ t: 'room.create', mode: 'coop', difficulty: 'NORMAL' })).t, 'ok');
+  const room = await host.waitFor('room.state');
+  assert.equal((await guest.request({ t: 'room.join', code: room.code })).t, 'ok');
+  assert.equal((await watcher.request({ t: 'room.spectate', code: room.code })).t, 'ok');
+  assert.deepEqual((await f.health()).presence, { online: 3, lobby: 0, waiting: 3, playing: 0 });
+  assert.equal((await f.health()).spectators, 1);
+
+  const resumed = await f.connect('观战', watcher.welcome.token);
+  await watcher.closed;
+  assert.equal((await f.health()).presence.online, 3, 'a resumed spectator still counts once');
+  assert.equal((await resumed.request({ t: 'room.join', code: room.code })).t, 'ok');
+  assert.equal((await f.health()).spectators, 0);
+  assert.deepEqual((await f.health()).presence, { online: 3, lobby: 0, waiting: 3, playing: 0 });
+  assert.equal((await resumed.request({ t: 'room.leave' })).t, 'ok');
+  assert.equal((await resumed.request({ t: 'room.spectate', code: room.code })).t, 'ok');
+  assert.equal((await guest.request({ t: 'room.ready', ready: true })).t, 'ok');
+  assert.equal((await host.request({ t: 'room.start' })).t, 'ok');
+  assert.deepEqual((await f.health()).presence, { online: 3, lobby: 0, waiting: 0, playing: 3 });
+  assert.equal((await resumed.request({ t: 'room.leave' })).t, 'ok');
+  assert.deepEqual((await f.health()).presence, { online: 3, lobby: 1, waiting: 0, playing: 2 });
+  await resumed.close();
+  assert.equal((await f.health()).presence.online, 2);
+});

@@ -3,12 +3,15 @@
 Repository: <https://github.com/Tianyi-ZJU/Stronghold-Protocol>.
 Upstream: <https://github.com/sganggs/Stronghold-Protocol>.
 Base: `bdb0765c5579c430cbe1ef79cf3d62831bb062a7` (0.1.2).
-Modification date: 2026-10-04.
+Latest merged upstream: `bce182703b1331e14fa442c51907c952461a568d` (0.1.3 and subsequent fixes).
+Modification date: 2026-10-05.
 
 The `fork-enhancements` branch contains the Hono HTTP refactor, online player
 counts, five feedback fixes, and their tests. The code remains GPL-3.0-or-later;
 original copyright notices and the Spine linking permission remain in place.
 Hono and its Node adapter retain their MIT licences in THIRD-PARTY-NOTICES.md.
+The upstream sync adopts its fuller beacon, bounty and model fixes while keeping
+the passive-skill raid fix and lifted-unit offsets in projectile heights.
 
 ## Run this branch
 
@@ -29,6 +32,8 @@ The title screen and lobby display aggregate online counts. Open `/online/` for
 the counts page. Visitors who have not entered a nickname, AI and disconnected
 reconnect records are excluded. Refreshing the same player does not add another
 player. Different browser identities are counted separately.
+Identified spectators count as online users too: waiting before the match,
+playing while watching a running match. Changing seats does not double-count.
 
 ## Publication scope
 
